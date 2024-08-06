@@ -6,13 +6,16 @@ import hashlib
 import os
 from datetime import datetime
 import socket
+import yaml
 
-api_key = "pCybSckj" #Client Id
-api_secret = "fRxTtujmaSqLcTztu7VK53OHCNmm0aid_ZwBt125sLY" # Client Secret
+with open('setup.yml', 'r') as file:
+    setup = yaml.safe_load(file)
+
+api_key = setup["api_key"] #Client Id
+api_secret = setup["api_secret"] # Client Secret
 
 username = api_key
-print(datetime.now().timestamp())
-timestamp_in_ms = datetime.now().strftime("%S") + "000"
+timestamp_in_ms = datetime.now().strftime('%S') + "000";
 nonce64 = base64.b64encode(os.urandom(32)).decode('ascii');
 raw_data = timestamp_in_ms + "." + nonce64;
 base_signature_string = raw_data + api_secret;
@@ -33,7 +36,7 @@ SOH = chr(1)
 
 # just to not code FIX timestamp, some date hardcoded
 body = "35=A" + SOH + "49=TestClient" + SOH + "56=DERIBITSERVER" + SOH + \
-"34=1" + SOH + "52=20200123-14:09:55.638" + SOH + "98=0" + SOH + "108=1" + SOH + \
+"34=1" + SOH + "52=20240805-12:09:55.638" + SOH + "98=0" + SOH + "108=1" + SOH + \
 "96=" + raw_data + SOH + "553=" + username + SOH + "554=" + password.decode('ascii') + SOH;
 
 buff = "8=FIX.4.4" + SOH + "9=" + str(len(body)) + SOH + body;
@@ -54,7 +57,5 @@ s.sendall(buff.encode('ascii'))
 print("Sent: " + repr(buff))
 
 data = s.recv(1024)
-
-s.close()
 print('Received: ', repr(data))
-    
+s.close()
